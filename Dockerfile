@@ -37,6 +37,9 @@ RUN set -x && curl -fsSL https://nodejs.org/dist/v4.2.6/node-v4.2.6-linux-x64.ta
     ln -s /opt/node/node-v4.2.6-linux-x64 /opt/node/default && \
     /opt/node/default/bin/npm config -g set registry  http://${REGISTRY_URL}/nexus/content/groups/npm/
 
+# jq
+RUN set -x && curl -sLo /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && \
+    chmod +x /usr/local/bin/jq
 
 USER "${JENKINS_USER}"
 
