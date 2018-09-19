@@ -16,15 +16,18 @@ ENV PATH ${PATH}:/opt/ant/apache-ant-${ANT_VERSION}/bin
 
 # apache-ivy
 WORKDIR /tmp
-RUN wget http://archive.apache.org/dist/ant/ivy/2.4.0/apache-ivy-2.4.0-bin.tar.gz && \
-    tar -zxvf apache-ivy-2.4.0-bin.tar.gz && \
-    cp apache-ivy-2.4.0/ivy-2.4.0.jar ${ANT_HOME}/lib/ && \
-    rm -f apache-ivy-2.4.0-bin.tar.gz
+RUN set -x && curl -fsSL http://archive.apache.org/dist/ant/ivy/2.4.0/apache-ivy-2.4.0-bin.tar.gz \
+    | tar -xzC /tmp && \
+    cp /tmp/apache-ivy-2.4.0/ivy-2.4.0.jar ${ANT_HOME}/lib/ && \
+    rm -f /tmp/apache-ivy-2.4.0-bin.tar.gz && \
+    rm -rf /tmp/apache-ivy-2.4.0/
+
 # ant-contlib
-RUN wget https://jaist.dl.sourceforge.net/project/ant-contrib/ant-contrib/1.0b3/ant-contrib-1.0b3-bin.tar.gz && \
-    tar -zxvf ant-contrib-1.0b3-bin.tar.gz && \
-    cp ant-contrib/ant-contrib-1.0b3.jar ${ANT_HOME}/lib/ && \
-    rm -f ant-contrib-1.0b3-bin.tar.gz
+RUN set -x && curl -fsSL https://jaist.dl.sourceforge.net/project/ant-contrib/ant-contrib/1.0b3/ant-contrib-1.0b3-bin.tar.gz \
+    | tar -xzC /tmp && \
+    cp /tmp/ant-contrib/ant-contrib-1.0b3.jar ${ANT_HOME}/lib/ && \
+    rm -f /tmp/ant-contrib-1.0b3-bin.tar.gz && \
+    rm -rf /tmp/ant-contrib/
 
 # nodejs
 ENV REGISTRY_URL localhost
@@ -39,5 +42,7 @@ RUN set -x && curl -fsSL https://nodejs.org/dist/v4.2.6/node-v4.2.6-linux-x64.ta
 # jq
 RUN set -x && curl -sLo /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && \
     chmod +x /usr/local/bin/jq
+
+WORKDIR /root
 
 USER "${JENKINS_USER}"
