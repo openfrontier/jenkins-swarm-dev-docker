@@ -5,7 +5,6 @@ MAINTAINER XJD <xing.jiudong@trans-cosmos.com.cn>
 USER root
 # apache-ant
 ENV ANT_VERSION 1.9.7
-RUN yum install -y wget
 RUN mkdir /opt/ant && cd /opt/ant && wget --no-check-certificate --no-cookies http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz \
     && wget --no-check-certificate --no-cookies http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz.sha512 \
     && echo "$(cat apache-ant-${ANT_VERSION}-bin.tar.gz.sha512) apache-ant-${ANT_VERSION}-bin.tar.gz" | sha512sum -c \
@@ -42,5 +41,3 @@ RUN set -x && curl -sLo /usr/local/bin/jq https://github.com/stedolan/jq/release
     chmod +x /usr/local/bin/jq
 
 USER "${JENKINS_USER}"
-
-
