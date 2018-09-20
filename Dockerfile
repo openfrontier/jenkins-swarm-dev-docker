@@ -1,4 +1,4 @@
-FROM xingjiudong/jenkins-oraclejdk-swarm-maven-slave
+FROM openfrontier/jenkins-swarm-maven-slave:oracle-jdk
 
 MAINTAINER XJD <xing.jiudong@trans-cosmos.com.cn>
 
