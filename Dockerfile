@@ -10,7 +10,7 @@ ENV ANT_VERSION=1.9.7 \
     NODEJS_VERSION=v4.2.6 \
     JQ_VERSION=1.5
 
-ENV REGISTRY_URL=${REGISTRY_URL:-localhost}
+ENV REGISTRY_HOST=${REGISTRY_URL:-localhost}
 
 # apache-ant
 RUN mkdir /opt/ant \
@@ -41,7 +41,7 @@ RUN set -x && curl -fsSL https://jaist.dl.sourceforge.net/project/ant-contrib/an
 RUN set -x && mkdir /opt/node && curl -fsSL https://nodejs.org/dist/${NODEJS_VERSION}/node-${NODEJS_VERSION}-linux-x64.tar.gz \
     | tar -xzC /opt/node && \
     ln -s /opt/node/node-${NODEJS_VERSION}-linux-x64 /opt/node/default && \
-    /opt/node/default/bin/npm config -g set registry  http://${REGISTRY_URL}/nexus/content/groups/npm/
+    /opt/node/default/bin/npm config -g set registry  http://${REGISTRY_HOST}/nexus/content/groups/npm/
 
 # jq
 RUN set -x && curl -sLo /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 && \
