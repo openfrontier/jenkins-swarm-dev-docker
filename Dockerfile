@@ -3,46 +3,48 @@ FROM openfrontier/jenkins-swarm-maven-slave:oracle-jdk
 MAINTAINER XJD <xing.jiudong@trans-cosmos.com.cn>
 
 USER root
+
+ENV ANT_VERSION=1.9.7 \
+    IVY_VERSION=2.4.0 \
+    ANT_CONTLIB_VERSION=1.0b3 \
+    NODEJS_VERSION=v4.2.6 \
+    JQ_VERSION=1.5
+
+ENV REGISTRY_URL=${REGISTRY_URL:-localhost}
+
 # apache-ant
-ENV ANT_VERSION 1.9.7
-RUN mkdir /opt/ant && cd /opt/ant && wget --no-check-certificate --no-cookies http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz \
-    && wget --no-check-certificate --no-cookies http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz.sha512 \
-    && echo "$(cat apache-ant-${ANT_VERSION}-bin.tar.gz.sha512) apache-ant-${ANT_VERSION}-bin.tar.gz" | sha512sum -c \
-    && tar -zvxf apache-ant-${ANT_VERSION}-bin.tar.gz -C /opt/ant/ \
-    && rm -f apache-ant-${ANT_VERSION}-bin.tar.gz \
-    && rm -f apache-ant-${ANT_VERSION}-bin.tar.gz.sha512
+RUN mkdir /opt/ant \
+    && wget -nv -P /opt/ant --no-check-certificate --no-cookies http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz \
+    && wget -nv -P /opt/ant --no-check-certificate --no-cookies http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz.sha512 \
+    && echo "$(cat /opt/ant/apache-ant-${ANT_VERSION}-bin.tar.gz.sha512) /opt/ant/apache-ant-${ANT_VERSION}-bin.tar.gz" | sha512sum -c \
+    && tar -zxf /opt/ant/apache-ant-${ANT_VERSION}-bin.tar.gz -C /opt/ant/ \
+    && rm -f /opt/ant/apache-ant-${ANT_VERSION}-bin.tar.gz \
+    && rm -f /opt/ant/apache-ant-${ANT_VERSION}-bin.tar.gz.sha512
 ENV ANT_HOME /opt/ant/apache-ant-${ANT_VERSION}
 ENV PATH ${PATH}:/opt/ant/apache-ant-${ANT_VERSION}/bin
 
 # apache-ivy
-WORKDIR /tmp
-RUN set -x && curl -fsSL http://archive.apache.org/dist/ant/ivy/2.4.0/apache-ivy-2.4.0-bin.tar.gz \
-    | tar -xzC /tmp && \
-    cp /tmp/apache-ivy-2.4.0/ivy-2.4.0.jar ${ANT_HOME}/lib/ && \
-    rm -f /tmp/apache-ivy-2.4.0-bin.tar.gz && \
-    rm -rf /tmp/apache-ivy-2.4.0/
+RUN set -x && curl -fsSL http://archive.apache.org/dist/ant/ivy/${IVY_VERSION}/apache-ivy-${IVY_VERSION}-bin.tar.gz \
+    | tar -xzC ${ANT_HOME}/lib && \
+    cp ${ANT_HOME}/lib/apache-ivy-${IVY_VERSION}/ivy-${IVY_VERSION}.jar ${ANT_HOME}/lib/ && \
+    rm -f ${ANT_HOME}/lib/apache-ivy-${IVY_VERSION}-bin.tar.gz && \
+    rm -rf ${ANT_HOME}/lib/apache-ivy-${IVY_VERSION}/
 
 # ant-contlib
-RUN set -x && curl -fsSL https://jaist.dl.sourceforge.net/project/ant-contrib/ant-contrib/1.0b3/ant-contrib-1.0b3-bin.tar.gz \
-    | tar -xzC /tmp && \
-    cp /tmp/ant-contrib/ant-contrib-1.0b3.jar ${ANT_HOME}/lib/ && \
-    rm -f /tmp/ant-contrib-1.0b3-bin.tar.gz && \
-    rm -rf /tmp/ant-contrib/
+RUN set -x && curl -fsSL https://jaist.dl.sourceforge.net/project/ant-contrib/ant-contrib/${ANT_CONTLIB_VERSION}/ant-contrib-${ANT_CONTLIB_VERSION}-bin.tar.gz \
+    | tar -xzC ${ANT_HOME}/lib && \
+    cp ${ANT_HOME}/lib/ant-contrib/ant-contrib-${ANT_CONTLIB_VERSION}.jar ${ANT_HOME}/lib/ && \
+    rm -f ${ANT_HOME}/lib/ant-contrib-${ANT_CONTLIB_VERSION}-bin.tar.gz && \
+    rm -rf ${ANT_HOME}/lib/ant-contrib/
 
 # nodejs
-ENV REGISTRY_URL localhost
-RUN mkdir /opt/node
-RUN set -x && curl -fsSL https://nodejs.org/dist/v4.2.6/node-v4.2.6-linux-x64.tar.gz \
+RUN set -x && mkdir /opt/node && curl -fsSL https://nodejs.org/dist/${NODEJS_VERSION}/node-${NODEJS_VERSION}-linux-x64.tar.gz \
     | tar -xzC /opt/node && \
-    chown -R root:root /opt/node/node-v4.2.6-linux-x64 && \
-    chmod 775 /opt/node/node-v4.2.6-linux-x64 && \
-    ln -s /opt/node/node-v4.2.6-linux-x64 /opt/node/default && \
+    ln -s /opt/node/node-${NODEJS_VERSION}-linux-x64 /opt/node/default && \
     /opt/node/default/bin/npm config -g set registry  http://${REGISTRY_URL}/nexus/content/groups/npm/
 
 # jq
-RUN set -x && curl -sLo /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && \
+RUN set -x && curl -sLo /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 && \
     chmod +x /usr/local/bin/jq
-
-WORKDIR /root
 
 USER "${JENKINS_USER}"
